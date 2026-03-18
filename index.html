@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Project Product Calculator</title>
+    <title>Multi-Project Product Calculator v2.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
@@ -12,6 +12,13 @@
             font-family: 'Sarabun', sans-serif;
             background-color: #f3f4f6;
         }
+        /* ใช้รหัสสีมาตรฐานเพื่อป้องกัน html2canvas error oklch */
+        .bg-calc-header { background-color: #1f2937 !important; }
+        .bg-calc-card { background-color: #ffffff !important; }
+        .bg-calc-summary { background-color: #fff7ed !important; }
+        .bg-calc-result { background-color: #1f2937 !important; }
+        .bg-calc-profit { background-color: #374151 !important; }
+        
         .input-yellow { background-color: #fef9c3; }
         .input-blue { background-color: #dbeafe; }
         input::-webkit-outer-spin-button,
@@ -23,6 +30,9 @@
         .active-project {
             border-left: 4px solid #2563eb;
             background-color: #eff6ff;
+        }
+        .modal-bg {
+            background-color: rgba(0,0,0,0.6);
         }
     </style>
 </head>
@@ -42,20 +52,20 @@
             <div id="project-list" class="flex-1 overflow-y-auto p-2 space-y-1">
                 <!-- Projects will be rendered here -->
             </div>
-            <div class="p-4 border-t text-[10px] text-gray-400 text-center uppercase">
-                Project Manager v2.2
+            <div class="p-4 border-t text-[10px] text-gray-400 text-center uppercase tracking-widest">
+                Project Manager v2.5
             </div>
         </div>
 
         <!-- MAIN CONTENT -->
         <div class="flex-1 p-4 md:p-8">
-            <div id="calculator-card" class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-300">
+            <div id="calculator-card" class="max-w-2xl mx-auto bg-calc-card rounded-xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-300">
                 
                 <!-- Main Header -->
-                <div class="bg-gray-800 p-4 flex justify-between items-center">
+                <div class="bg-calc-header p-4 flex justify-between items-center">
                     <h1 class="text-white text-lg font-semibold uppercase tracking-wider">Product Calculator</h1>
-                    <button onclick="handleDeleteCurrent(event)" class="text-red-400 hover:text-red-300 p-2 rounded no-export transition" title="Delete Current Project">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
+                    <button onclick="showDeleteModal(currentProjectId, event)" class="bg-red-500/20 text-red-400 hover:bg-red-600 hover:text-white p-2 px-3 rounded no-export transition text-xs font-bold" title="Delete Current Project">
+                        ลบโปรเจกต์
                     </button>
                 </div>
 
@@ -144,7 +154,7 @@
                         </div>
 
                         <!-- Answer Summary -->
-                        <div class="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl space-y-2 shadow-sm">
+                        <div class="mt-6 p-4 bg-calc-summary border border-orange-200 rounded-xl space-y-2 shadow-sm">
                             <h3 class="text-orange-800 font-bold text-[10px] uppercase tracking-wider">Answer Summary</h3>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Total Sea Ship:</span>
@@ -161,21 +171,21 @@
                         </div>
 
                         <!-- Results -->
-                        <div class="bg-gray-800 rounded-xl p-5 mt-6 space-y-3 shadow-lg">
+                        <div class="bg-calc-result rounded-xl p-5 mt-6 space-y-3 shadow-lg">
                             <div class="flex justify-between items-center text-gray-300 text-xs">
                                 <span>Selling Price Per Unit</span>
                                 <span id="unit_final" class="font-bold text-white text-base">฿0</span>
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-700 pt-3">
                                 <div>
-                                    <span class="text-blue-400 font-bold text-lg leading-none uppercase">Grand Total Price</span>
+                                    <span class="text-blue-400 font-bold text-lg leading-none uppercase tracking-tighter">Grand Total Price</span>
                                     <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">ราคาสุทธิทั้งหมด</p>
                                 </div>
                                 <div id="grand_price" class="text-3xl font-black text-white">฿0</div>
                             </div>
-                            <div class="flex justify-between items-center bg-gray-700 -mx-5 px-5 py-3 mt-2 rounded-b-xl">
+                            <div class="flex justify-between items-center bg-calc-profit -mx-5 px-5 py-3 mt-2 rounded-b-xl">
                                 <div>
-                                    <span class="text-green-400 font-bold text-lg leading-none uppercase">Total Profit</span>
+                                    <span class="text-green-400 font-bold text-lg leading-none uppercase tracking-tighter">Total Profit</span>
                                     <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">กำไรรวมทั้งหมด</p>
                                 </div>
                                 <div id="grand_profit" class="text-2xl font-bold text-green-400">฿0</div>
@@ -198,22 +208,26 @@
         </div>
     </div>
 
+    <!-- CUSTOM MODAL FOR DELETION -->
+    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden no-export">
+        <div class="absolute inset-0 modal-bg" onclick="closeDeleteModal()"></div>
+        <div class="relative bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4">
+            <h3 class="text-lg font-bold text-gray-800">ยืนยันการลบ?</h3>
+            <p class="text-gray-500 text-sm mt-2">โปรเจกต์นี้จะถูกลบออกอย่างถาวร คุณแน่ใจหรือไม่?</p>
+            <div class="flex gap-3 mt-6">
+                <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition">ยกเลิก</button>
+                <button id="confirm-delete-btn" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition shadow-md">ลบออก</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // --- State ---
         let projects = [
-            {
-                id: Date.now(),
-                name: "Project 1",
-                detail: "Default calculation",
-                exw: 76.00,
-                rate: 5.00,
-                qty: 1,
-                shipPct: 40.00,
-                domesticPct: 3.00,
-                gpPct: 10.00
-            }
+            { id: Date.now(), name: "Project 1", detail: "Default calculation", exw: 76.00, rate: 5.00, qty: 1, shipPct: 40.00, domesticPct: 3.00, gpPct: 10.00 }
         ];
         let currentProjectId = projects[0].id;
+        let pendingDeleteId = null;
 
         // --- View Logic ---
         function renderProjectList() {
@@ -230,7 +244,7 @@
                         <div class="text-sm font-bold text-gray-800 truncate">${p.name || 'Untitled'}</div>
                         <div class="text-[10px] text-gray-400">Qty: ${p.qty}</div>
                     </div>
-                    <button onclick="handleDeleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition" title="Delete Project">
+                    <button onclick="showDeleteModal(${p.id}, event)" class="opacity-40 group-hover:opacity-100 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition" title="Delete Project">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
                     </button>
                 `;
@@ -249,18 +263,12 @@
             projects.push({
                 id: newId,
                 name: `Project ${projects.length + 1}`,
-                detail: "",
-                exw: 0,
-                rate: 5,
-                qty: 1,
-                shipPct: 0,
-                domesticPct: 0,
-                gpPct: 0
+                detail: "", exw: 0, rate: 5, qty: 1, shipPct: 0, domesticPct: 0, gpPct: 0
             });
             switchProject(newId);
         }
 
-        function handleDeleteProject(id, event) {
+        function showDeleteModal(id, event) {
             if (event) {
                 event.stopPropagation();
                 event.preventDefault();
@@ -271,21 +279,33 @@
                 return;
             }
 
-            if (confirm("ยืนยันการลบโปรเจกต์นี้?")) {
-                const isDeletingActive = (currentProjectId === id);
-                projects = projects.filter(p => p.id !== id);
-                
-                if (isDeletingActive) {
-                    currentProjectId = projects[0].id;
-                }
-                
-                loadCurrentProjectData();
-                renderProjectList();
+            pendingDeleteId = id;
+            document.getElementById('delete-modal').classList.remove('hidden');
+            document.getElementById('confirm-delete-btn').onclick = executeDelete;
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.add('hidden');
+            pendingDeleteId = null;
+        }
+
+        function executeDelete() {
+            if (!pendingDeleteId) return;
+
+            const isDeletingActive = (currentProjectId === pendingDeleteId);
+            projects = projects.filter(p => p.id !== pendingDeleteId);
+            
+            if (isDeletingActive) {
+                currentProjectId = projects[0].id;
             }
+            
+            closeDeleteModal();
+            loadCurrentProjectData();
+            renderProjectList();
         }
 
         function handleDeleteCurrent(event) {
-            handleDeleteProject(currentProjectId, event);
+            showDeleteModal(currentProjectId, event);
         }
 
         function loadCurrentProjectData() {
@@ -297,9 +317,11 @@
             document.getElementById('exw_price').value = p.exw || "";
             document.getElementById('exc_rate').value = p.rate || "";
             document.getElementById('quantity').value = p.qty || "";
-            document.getElementById('ship_pct').value = p.shipPct || "";
-            document.getElementById('domestic_pct').value = p.domesticPct || "";
-            document.getElementById('gp_pct').value = p.gpPct || "";
+            
+            // Sync hidden inputs if any
+            if(document.getElementById('ship_pct')) document.getElementById('ship_pct').value = p.shipPct;
+            if(document.getElementById('domestic_pct')) document.getElementById('domestic_pct').value = p.domesticPct;
+            if(document.getElementById('gp_pct')) document.getElementById('gp_pct').value = p.gpPct;
 
             calculate();
         }
@@ -355,10 +377,9 @@
             const btns = document.getElementById('action-buttons');
             const pName = document.getElementById('product_name').value || 'Calculation';
 
+            // Sync input values to DOM for html2canvas
             document.querySelectorAll('input, textarea').forEach(el => {
-                if (el.type !== 'checkbox' && el.type !== 'radio') {
-                    el.setAttribute('value', el.value);
-                }
+                el.setAttribute('value', el.value);
             });
 
             btns.classList.add('no-export');
@@ -369,6 +390,7 @@
                     backgroundColor: "#ffffff",
                     logging: false,
                     onclone: (clonedDoc) => {
+                        // Ensure input values are correct in the clone
                         const cloneName = clonedDoc.getElementById('product_name');
                         const cloneDetail = clonedDoc.getElementById('product_detail');
                         if (cloneName) cloneName.value = document.getElementById('product_name').value;
@@ -380,7 +402,8 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (err) {
-                alert('Export failed: ' + err.message);
+                console.error("Capture Error:", err);
+                alert('เกิดข้อผิดพลาดในการบันทึกรูปภาพ: ' + err.message);
             } finally {
                 btns.classList.remove('no-export');
             }
