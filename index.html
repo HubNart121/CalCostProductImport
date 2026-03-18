@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณราคาสินค้า (Product Cost Calculator)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .input-yellow {
+            background-color: #fef9c3;
+        }
+        .input-blue {
+            background-color: #dbeafe;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <div class="bg-gray-800 p-4">
+            <h1 class="text-white text-xl font-semibold text-center">Product Pricing Calculator</h1>
+        </div>
+
+        <div class="p-6 space-y-1">
+            <!-- Table Header -->
+            <div class="grid grid-cols-12 gap-2 pb-2 border-b font-semibold text-gray-600 text-sm">
+                <div class="col-span-5 text-left">รายการ (Description)</div>
+                <div class="col-span-4 text-right">จำนวน (Value)</div>
+                <div class="col-span-3 text-right">หน่วย (Unit)</div>
+            </div>
+
+            <!-- EXW Price -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700 font-medium">EXW Price</div>
+                <div class="col-span-4">
+                    <input type="number" id="exw_price" value="76.00" step="0.01"
+                        class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                </div>
+                <div class="col-span-3 text-right text-gray-500">¥</div>
+            </div>
+
+            <!-- EXC Rate -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700 font-medium">EXC Rate</div>
+                <div class="col-span-4">
+                    <input type="number" id="exc_rate" value="5" step="0.01"
+                        class="w-full text-right p-2 border border-gray-300 rounded input-blue focus:ring-2 focus:ring-blue-400 outline-none">
+                </div>
+                <div class="col-span-3 text-right text-gray-500">Thb/RMB</div>
+            </div>
+
+            <!-- Quantity Section -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2 bg-yellow-50 rounded-lg px-2 -mx-2 border border-yellow-100">
+                <div class="col-span-5 text-orange-700 font-bold italic">Quantity (จำนวนสินค้า)</div>
+                <div class="col-span-4">
+                    <input type="number" id="quantity" value="1" min="1" step="1"
+                        class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow focus:ring-2 focus:ring-orange-400 outline-none font-bold">
+                </div>
+                <div class="col-span-3 text-right text-gray-500 italic">PCS</div>
+            </div>
+
+            <hr class="my-4 border-gray-100">
+
+            <!-- Product Price (THB) -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700">Product Price (THB)</div>
+                <div class="col-span-4 text-right pr-2 text-lg font-semibold" id="product_price_thb">฿380.00</div>
+                <div class="col-span-3 text-right text-gray-400 text-xs">THB/PCS</div>
+            </div>
+
+            <!-- Over Sea ship cost -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700">Over Sea ship cost (%)</div>
+                <div class="col-span-4">
+                    <input type="number" id="ship_cost_pct" value="40.00" step="0.01"
+                        class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                </div>
+                <div class="col-span-3 text-right text-gray-500">%</div>
+            </div>
+
+            <!-- Domestic & packing cost -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700">Domestic & packing (%)</div>
+                <div class="col-span-4">
+                    <input type="number" id="domestic_cost_pct" value="3.00" step="0.01"
+                        class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                </div>
+                <div class="col-span-3 text-right text-gray-500">%</div>
+            </div>
+
+            <!-- GP Margin -->
+            <div class="grid grid-cols-12 gap-2 items-center py-2">
+                <div class="col-span-5 text-gray-700">GP Margin (%)</div>
+                <div class="col-span-4">
+                    <input type="number" id="gp_pct" value="10.00" step="0.01"
+                        class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                </div>
+                <div class="col-span-3 text-right text-gray-500">%</div>
+            </div>
+
+            <!-- ANSWER SUMMARY BOX (Clean version) -->
+            <div class="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl space-y-3 shadow-sm">
+                <h3 class="text-orange-800 font-bold text-xs uppercase tracking-wider">สรุปคำตอบยอดรวม (Answer Summary)</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center border-b border-orange-100 pb-2">
+                        <span class="text-gray-600 text-sm">ยอดรวมค่าขนส่ง (Total Sea Ship):</span>
+                        <span id="breakdown_ship" class="font-bold text-lg text-gray-900">253</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600 text-sm">ยอดรวมค่าดำเนินการ (Total Domestic):</span>
+                        <span id="breakdown_domestic" class="font-bold text-lg text-gray-900">20</span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-6 border-gray-200">
+
+            <!-- Result Summary Section -->
+            <div class="bg-gray-800 rounded-xl p-5 space-y-3 shadow-lg">
+                <div class="flex justify-between items-center text-gray-300 text-sm">
+                    <span>ราคาขายต่อชิ้น (Price Per Unit)</span>
+                    <span id="unit_price_final" class="font-bold text-white text-lg">฿725</span>
+                </div>
+
+                <div class="flex justify-between items-center border-t border-gray-700 pt-3">
+                    <div class="flex flex-col">
+                        <span class="text-blue-400 font-bold text-lg uppercase leading-none">Grand Total Price</span>
+                        <span class="text-[10px] text-gray-500 mt-1 uppercase italic">ราคาสุทธิทั้งหมด</span>
+                    </div>
+                    <div id="grand_total_price" class="text-4xl font-black text-white">฿725</div>
+                </div>
+
+                <div class="flex justify-between items-center bg-gray-700 -mx-5 px-5 py-3 mt-2 rounded-b-xl">
+                    <div class="flex flex-col">
+                        <span class="text-green-400 font-bold text-lg uppercase leading-none">Total Profit</span>
+                        <span class="text-[10px] text-gray-500 mt-1 uppercase italic">กำไรรวมทั้งหมด</span>
+                    </div>
+                    <div id="grand_total_profit" class="text-3xl font-bold text-green-400">฿73</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-4 text-center text-[10px] text-gray-400 uppercase tracking-widest">
+            Automatic Calculation Engine
+        </div>
+    </div>
+
+    <script>
+        const inputIds = [
+            'exw_price', 'exc_rate', 'quantity', 'ship_cost_pct', 'domestic_cost_pct', 'gp_pct'
+        ];
+
+        const elements = {};
+        inputIds.forEach(id => {
+            elements[id] = document.getElementById(id);
+        });
+
+        const outputs = {
+            product_price_thb: document.getElementById('product_price_thb'),
+            breakdown_ship: document.getElementById('breakdown_ship'),
+            breakdown_domestic: document.getElementById('breakdown_domestic'),
+            unit_price_final: document.getElementById('unit_price_final'),
+            grand_total_price: document.getElementById('grand_total_price'),
+            grand_total_profit: document.getElementById('grand_total_profit')
+        };
+
+        function formatNum(val) {
+            return Math.round(val).toLocaleString();
+        }
+
+        function calculate() {
+            const exw = parseFloat(elements.exw_price.value) || 0;
+            const rate = parseFloat(elements.exc_rate.value) || 0;
+            const qty = parseFloat(elements.quantity.value) || 1;
+            const shipPct = (parseFloat(elements.ship_cost_pct.value) || 0) / 100;
+            const domesticPct = (parseFloat(elements.domestic_cost_pct.value) || 0) / 100;
+            const gpPct = (parseFloat(elements.gp_pct.value) || 0) / 100;
+
+            // 1. Per Unit Calculations
+            const unitProductPrice = exw * rate;
+            outputs.product_price_thb.innerText = "฿" + unitProductPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+            // Ship Cost Per Unit
+            const unitCostShipMain = shipPct < 1 ? unitProductPrice / (1 - shipPct) : 0;
+            const unitCostShipDiff = unitCostShipMain - unitProductPrice;
+            
+            // Domestic Cost Per Unit
+            const unitTotalCostMain = domesticPct < 1 ? unitCostShipMain / (1 - domesticPct) : 0;
+            const unitTotalCostDiff = unitTotalCostMain - unitCostShipMain;
+
+            // Final Price Per Unit
+            const unitTotalPrice = gpPct < 1 ? unitTotalCostMain / (1 - gpPct) : 0;
+            const unitProfit = unitTotalPrice - unitTotalCostMain;
+
+            // 2. Update Clean Summary (Only show the Answer)
+            const totalShipCost = Math.round(unitCostShipDiff) * qty;
+            const totalDomesticCost = Math.round(unitTotalCostDiff) * qty;
+            
+            outputs.breakdown_ship.innerText = "฿" + formatNum(totalShipCost);
+            outputs.breakdown_domestic.innerText = "฿" + formatNum(totalDomesticCost);
+
+            // 3. Update Results
+            outputs.unit_price_final.innerText = "฿" + formatNum(unitTotalPrice);
+            outputs.grand_total_price.innerText = "฿" + formatNum(unitTotalPrice * qty);
+            outputs.grand_total_profit.innerText = "฿" + formatNum(unitProfit * qty);
+        }
+
+        inputIds.forEach(id => {
+            elements[id].addEventListener('input', calculate);
+        });
+
+        window.onload = calculate;
+    </script>
+</body>
+</html>
