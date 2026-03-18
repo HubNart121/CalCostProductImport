@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Project Product Calculator v2.5</title>
+    <title>เครื่องคำนวณราคาสินค้า (Product Cost Calculator)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
@@ -12,407 +12,276 @@
             font-family: 'Sarabun', sans-serif;
             background-color: #f3f4f6;
         }
-        /* ใช้รหัสสีมาตรฐานเพื่อป้องกัน html2canvas error oklch */
-        .bg-calc-header { background-color: #1f2937 !important; }
-        .bg-calc-card { background-color: #ffffff !important; }
-        .bg-calc-summary { background-color: #fff7ed !important; }
-        .bg-calc-result { background-color: #1f2937 !important; }
-        .bg-calc-profit { background-color: #374151 !important; }
-        
-        .input-yellow { background-color: #fef9c3; }
-        .input-blue { background-color: #dbeafe; }
+        .input-yellow {
+            background-color: #fef9c3;
+        }
+        .input-blue {
+            background-color: #dbeafe;
+        }
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
-        .no-export { display: none !important; }
-        .active-project {
-            border-left: 4px solid #2563eb;
-            background-color: #eff6ff;
-        }
-        .modal-bg {
-            background-color: rgba(0,0,0,0.6);
+        /* Style for saving image to ensure no buttons show in the capture */
+        .no-export {
+            display: none !important;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="p-4 md:p-8">
 
-    <div class="flex flex-col md:flex-row min-h-screen">
-        
-        <!-- SIDEBAR: Project Management -->
-        <div class="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col no-print">
-            <div class="p-4 border-b bg-gray-800">
-                <h2 class="text-white font-bold text-lg">My Projects</h2>
-                <button onclick="addNewProject()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded flex items-center justify-center gap-2 transition shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
-                    New Project
+    <div id="calculator-card" class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
+        <!-- Main Header -->
+        <div class="bg-gray-800 p-4">
+            <h1 class="text-white text-xl font-semibold text-center uppercase tracking-wider">Product Pricing Calculator</h1>
+        </div>
+
+        <div class="p-6 space-y-4">
+            
+            <!-- NEW SECTION: Header & Detail -->
+            <div class="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Product Name / Title (หัวข้อสินค้า)</label>
+                    <input type="text" id="product_name" placeholder="ระบุชื่อสินค้าหรือชื่อโปรเจกต์..." 
+                        class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 outline-none font-semibold text-gray-800">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detail (รายละเอียด)</label>
+                    <textarea id="product_detail" placeholder="ระบุรายละเอียดเพิ่มเติม..." rows="2"
+                        class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 outline-none text-sm text-gray-600"></textarea>
+                </div>
+            </div>
+
+            <hr class="border-gray-100">
+
+            <div class="space-y-1">
+                <!-- Table Header -->
+                <div class="grid grid-cols-12 gap-2 pb-2 border-b font-semibold text-gray-600 text-sm">
+                    <div class="col-span-5 text-left">รายการ (Description)</div>
+                    <div class="col-span-4 text-right">จำนวน (Value)</div>
+                    <div class="col-span-3 text-right">หน่วย (Unit)</div>
+                </div>
+
+                <!-- EXW Price -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700 font-medium">EXW Price</div>
+                    <div class="col-span-4">
+                        <input type="number" id="exw_price" value="76.00" step="0.01"
+                            class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500">¥</div>
+                </div>
+
+                <!-- EXC Rate -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700 font-medium">EXC Rate</div>
+                    <div class="col-span-4">
+                        <input type="number" id="exc_rate" value="5" step="0.01"
+                            class="w-full text-right p-2 border border-gray-300 rounded input-blue focus:ring-2 focus:ring-blue-400 outline-none">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500">Thb/RMB</div>
+                </div>
+
+                <!-- Quantity Section -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2 bg-yellow-50 rounded-lg px-2 -mx-2 border border-yellow-100">
+                    <div class="col-span-5 text-orange-700 font-bold italic">Quantity (จำนวนสินค้า)</div>
+                    <div class="col-span-4">
+                        <input type="number" id="quantity" value="1" min="1" step="1"
+                            class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow focus:ring-2 focus:ring-orange-400 outline-none font-bold">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500 italic">PCS</div>
+                </div>
+
+                <hr class="my-4 border-gray-100">
+
+                <!-- Product Price (THB) -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700">Product Price (THB)</div>
+                    <div class="col-span-4 text-right pr-2 text-lg font-semibold" id="product_price_thb">฿380.00</div>
+                    <div class="col-span-3 text-right text-gray-400 text-xs">THB/PCS</div>
+                </div>
+
+                <!-- Over Sea ship cost -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700">Over Sea ship cost (%)</div>
+                    <div class="col-span-4">
+                        <input type="number" id="ship_cost_pct" value="40.00" step="0.01"
+                            class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500">%</div>
+                </div>
+
+                <!-- Domestic & packing cost -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700">Domestic & packing (%)</div>
+                    <div class="col-span-4">
+                        <input type="number" id="domestic_cost_pct" value="3.00" step="0.01"
+                            class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500">%</div>
+                </div>
+
+                <!-- GP Margin -->
+                <div class="grid grid-cols-12 gap-2 items-center py-2">
+                    <div class="col-span-5 text-gray-700">GP Margin (%)</div>
+                    <div class="col-span-4">
+                        <input type="number" id="gp_pct" value="10.00" step="0.01"
+                            class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
+                    </div>
+                    <div class="col-span-3 text-right text-gray-500">%</div>
+                </div>
+
+                <!-- ANSWER SUMMARY BOX -->
+                <div class="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl space-y-3 shadow-sm">
+                    <h3 class="text-orange-800 font-bold text-xs uppercase tracking-wider">สรุปคำตอบยอดรวม (Answer Summary)</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-orange-100 pb-2">
+                            <span class="text-gray-600 text-sm">ยอดรวมค่าขนส่ง (Total Sea Ship):</span>
+                            <span id="breakdown_ship" class="font-bold text-lg text-gray-900">฿253</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-orange-100 pb-2">
+                            <span class="text-gray-600 text-sm">ยอดรวมค่าดำเนินการ (Total Domestic):</span>
+                            <span id="breakdown_domestic" class="font-bold text-lg text-gray-900">฿20</span>
+                        </div>
+                        <div class="flex justify-between items-center pt-1">
+                            <span class="text-orange-900 font-bold text-sm underline italic">ต้นทุนรวมทั้งหมด (Total Cost):</span>
+                            <span id="breakdown_total_cost" class="font-black text-xl text-orange-700">฿653</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-6 border-gray-200">
+
+                <!-- Result Summary Section -->
+                <div class="bg-gray-800 rounded-xl p-5 space-y-3 shadow-lg">
+                    <div class="flex justify-between items-center text-gray-300 text-sm">
+                        <span>ราคาขายต่อชิ้น (Price Per Unit)</span>
+                        <span id="unit_price_final" class="font-bold text-white text-lg">฿725</span>
+                    </div>
+
+                    <div class="flex justify-between items-center border-t border-gray-700 pt-3">
+                        <div class="flex flex-col">
+                            <span class="text-blue-400 font-bold text-lg uppercase leading-none">Grand Total Price</span>
+                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic">ราคาสุทธิทั้งหมด</span>
+                        </div>
+                        <div id="grand_total_price" class="text-4xl font-black text-white">฿725</div>
+                    </div>
+
+                    <div class="flex justify-between items-center bg-gray-700 -mx-5 px-5 py-3 mt-2 rounded-b-xl">
+                        <div class="flex flex-col">
+                            <span class="text-green-400 font-bold text-lg uppercase leading-none">Total Profit</span>
+                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic">กำไรรวมทั้งหมด</span>
+                        </div>
+                        <div id="grand_total_profit" class="text-3xl font-bold text-green-400">฿73</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- EXPORT BUTTON SECTION -->
+            <div id="action-buttons" class="mt-6">
+                <button onclick="saveAsImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM176,192H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Z"></path></svg>
+                    บันทึกเป็นรูปภาพ (Save as Image)
                 </button>
             </div>
-            <div id="project-list" class="flex-1 overflow-y-auto p-2 space-y-1">
-                <!-- Projects will be rendered here -->
-            </div>
-            <div class="p-4 border-t text-[10px] text-gray-400 text-center uppercase tracking-widest">
-                Project Manager v2.5
-            </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="flex-1 p-4 md:p-8">
-            <div id="calculator-card" class="max-w-2xl mx-auto bg-calc-card rounded-xl shadow-lg overflow-hidden border border-gray-200 transition-all duration-300">
-                
-                <!-- Main Header -->
-                <div class="bg-calc-header p-4 flex justify-between items-center">
-                    <h1 class="text-white text-lg font-semibold uppercase tracking-wider">Product Calculator</h1>
-                    <button onclick="showDeleteModal(currentProjectId, event)" class="bg-red-500/20 text-red-400 hover:bg-red-600 hover:text-white p-2 px-3 rounded no-export transition text-xs font-bold" title="Delete Current Project">
-                        ลบโปรเจกต์
-                    </button>
-                </div>
-
-                <div class="p-6 space-y-4">
-                    <!-- Info Section -->
-                    <div class="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Project Name (ชื่อโปรเจกต์)</label>
-                            <input type="text" id="product_name" oninput="updateProjectData('name', this.value)" placeholder="Project Name..." 
-                                class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 outline-none font-semibold text-gray-800">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Detail (รายละเอียด)</label>
-                            <textarea id="product_detail" oninput="updateProjectData('detail', this.value)" placeholder="Add details..." rows="2"
-                                class="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-400 outline-none text-sm text-gray-600"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1">
-                        <div class="grid grid-cols-12 gap-2 pb-2 border-b font-semibold text-gray-600 text-[10px] uppercase">
-                            <div class="col-span-5">Description</div>
-                            <div class="col-span-4 text-right">Value</div>
-                            <div class="col-span-3 text-right">Unit</div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2">
-                            <div class="col-span-5 text-gray-700 font-medium text-sm">EXW Price</div>
-                            <div class="col-span-4">
-                                <input type="number" id="exw_price" oninput="updateProjectData('exw', this.value)" step="0.01"
-                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm focus:ring-2 focus:ring-yellow-400 outline-none">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500">¥</div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2">
-                            <div class="col-span-5 text-gray-700 font-medium text-sm">EXC Rate</div>
-                            <div class="col-span-4">
-                                <input type="number" id="exc_rate" oninput="updateProjectData('rate', this.value)" step="0.01"
-                                    class="w-full text-right p-2 border border-gray-300 rounded input-blue text-sm focus:ring-2 focus:ring-blue-400 outline-none">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500 text-xs italic">Thb/RMB</div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2 bg-yellow-50 rounded-lg px-2 -mx-2 border border-yellow-100">
-                            <div class="col-span-5 text-orange-700 font-bold italic text-sm">Quantity</div>
-                            <div class="col-span-4">
-                                <input type="number" id="quantity" oninput="updateProjectData('qty', this.value)" min="1"
-                                    class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow text-sm focus:ring-2 focus:ring-orange-400 outline-none font-bold">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500 italic text-xs uppercase">pcs</div>
-                        </div>
-
-                        <hr class="my-4 border-gray-100">
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-1 text-xs">
-                            <div class="col-span-5 text-gray-500 italic">Price THB (base)</div>
-                            <div class="col-span-4 text-right pr-2 font-semibold text-gray-700" id="product_price_thb">฿0.00</div>
-                            <div class="col-span-3"></div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2">
-                            <div class="col-span-5 text-gray-700 text-sm">Shipping Cost (%)</div>
-                            <div class="col-span-4">
-                                <input type="number" id="ship_pct" oninput="updateProjectData('shipPct', this.value)" step="0.01"
-                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2">
-                            <div class="col-span-5 text-gray-700 text-sm">Domestic/Packing (%)</div>
-                            <div class="col-span-4">
-                                <input type="number" id="domestic_pct" oninput="updateProjectData('domesticPct', this.value)" step="0.01"
-                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
-                        </div>
-
-                        <div class="grid grid-cols-12 gap-2 items-center py-2">
-                            <div class="col-span-5 text-gray-700 text-sm">GP Margin (%)</div>
-                            <div class="col-span-4">
-                                <input type="number" id="gp_pct" oninput="updateProjectData('gpPct', this.value)" step="0.01"
-                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
-                            </div>
-                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
-                        </div>
-
-                        <!-- Answer Summary -->
-                        <div class="mt-6 p-4 bg-calc-summary border border-orange-200 rounded-xl space-y-2 shadow-sm">
-                            <h3 class="text-orange-800 font-bold text-[10px] uppercase tracking-wider">Answer Summary</h3>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Total Sea Ship:</span>
-                                <span id="sum_ship" class="font-bold">฿0</span>
-                            </div>
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Total Domestic:</span>
-                                <span id="sum_domestic" class="font-bold">฿0</span>
-                            </div>
-                            <div class="flex justify-between border-t border-orange-200 pt-2">
-                                <span class="text-orange-900 font-bold text-sm underline italic">Total Cost:</span>
-                                <span id="sum_total_cost" class="font-black text-xl text-orange-700">฿0</span>
-                            </div>
-                        </div>
-
-                        <!-- Results -->
-                        <div class="bg-calc-result rounded-xl p-5 mt-6 space-y-3 shadow-lg">
-                            <div class="flex justify-between items-center text-gray-300 text-xs">
-                                <span>Selling Price Per Unit</span>
-                                <span id="unit_final" class="font-bold text-white text-base">฿0</span>
-                            </div>
-                            <div class="flex justify-between items-center border-t border-gray-700 pt-3">
-                                <div>
-                                    <span class="text-blue-400 font-bold text-lg leading-none uppercase tracking-tighter">Grand Total Price</span>
-                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">ราคาสุทธิทั้งหมด</p>
-                                </div>
-                                <div id="grand_price" class="text-3xl font-black text-white">฿0</div>
-                            </div>
-                            <div class="flex justify-between items-center bg-calc-profit -mx-5 px-5 py-3 mt-2 rounded-b-xl">
-                                <div>
-                                    <span class="text-green-400 font-bold text-lg leading-none uppercase tracking-tighter">Total Profit</span>
-                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">กำไรรวมทั้งหมด</p>
-                                </div>
-                                <div id="grand_profit" class="text-2xl font-bold text-green-400">฿0</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="action-buttons" class="mt-6">
-                        <button onclick="saveAsImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM176,192H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Z"></path></svg>
-                            Save current as Image
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-gray-100 p-3 text-center text-[9px] text-gray-400 uppercase tracking-widest">
-                    Precision Calculation Engine
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CUSTOM MODAL FOR DELETION -->
-    <div id="delete-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden no-export">
-        <div class="absolute inset-0 modal-bg" onclick="closeDeleteModal()"></div>
-        <div class="relative bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full mx-4">
-            <h3 class="text-lg font-bold text-gray-800">ยืนยันการลบ?</h3>
-            <p class="text-gray-500 text-sm mt-2">โปรเจกต์นี้จะถูกลบออกอย่างถาวร คุณแน่ใจหรือไม่?</p>
-            <div class="flex gap-3 mt-6">
-                <button onclick="closeDeleteModal()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-lg transition">ยกเลิก</button>
-                <button id="confirm-delete-btn" class="flex-1 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition shadow-md">ลบออก</button>
-            </div>
+        <div class="bg-gray-100 p-4 text-center text-[10px] text-gray-400 uppercase tracking-widest">
+            Automatic Calculation Engine
         </div>
     </div>
 
     <script>
-        // --- State ---
-        let projects = [
-            { id: Date.now(), name: "Project 1", detail: "Default calculation", exw: 76.00, rate: 5.00, qty: 1, shipPct: 40.00, domesticPct: 3.00, gpPct: 10.00 }
+        const inputIds = [
+            'exw_price', 'exc_rate', 'quantity', 'ship_cost_pct', 'domestic_cost_pct', 'gp_pct'
         ];
-        let currentProjectId = projects[0].id;
-        let pendingDeleteId = null;
 
-        // --- View Logic ---
-        function renderProjectList() {
-            const list = document.getElementById('project-list');
-            list.innerHTML = '';
-            
-            projects.forEach(p => {
-                const div = document.createElement('div');
-                div.className = `p-3 rounded cursor-pointer transition flex justify-between items-center group border ${p.id === currentProjectId ? 'active-project' : 'border-transparent hover:bg-gray-50'}`;
-                div.onclick = () => switchProject(p.id);
-                
-                div.innerHTML = `
-                    <div class="truncate pr-2">
-                        <div class="text-sm font-bold text-gray-800 truncate">${p.name || 'Untitled'}</div>
-                        <div class="text-[10px] text-gray-400">Qty: ${p.qty}</div>
-                    </div>
-                    <button onclick="showDeleteModal(${p.id}, event)" class="opacity-40 group-hover:opacity-100 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition" title="Delete Project">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
-                    </button>
-                `;
-                list.appendChild(div);
-            });
-        }
+        const elements = {};
+        inputIds.forEach(id => {
+            elements[id] = document.getElementById(id);
+        });
 
-        function switchProject(id) {
-            currentProjectId = id;
-            loadCurrentProjectData();
-            renderProjectList();
-        }
+        const outputs = {
+            product_price_thb: document.getElementById('product_price_thb'),
+            breakdown_ship: document.getElementById('breakdown_ship'),
+            breakdown_domestic: document.getElementById('breakdown_domestic'),
+            breakdown_total_cost: document.getElementById('breakdown_total_cost'),
+            unit_price_final: document.getElementById('unit_price_final'),
+            grand_total_price: document.getElementById('grand_total_price'),
+            grand_total_profit: document.getElementById('grand_total_profit')
+        };
 
-        function addNewProject() {
-            const newId = Date.now();
-            projects.push({
-                id: newId,
-                name: `Project ${projects.length + 1}`,
-                detail: "", exw: 0, rate: 5, qty: 1, shipPct: 0, domesticPct: 0, gpPct: 0
-            });
-            switchProject(newId);
-        }
-
-        function showDeleteModal(id, event) {
-            if (event) {
-                event.stopPropagation();
-                event.preventDefault();
-            }
-            
-            if (projects.length <= 1) {
-                alert("ต้องมีอย่างน้อย 1 โปรเจกต์ครับ");
-                return;
-            }
-
-            pendingDeleteId = id;
-            document.getElementById('delete-modal').classList.remove('hidden');
-            document.getElementById('confirm-delete-btn').onclick = executeDelete;
-        }
-
-        function closeDeleteModal() {
-            document.getElementById('delete-modal').classList.add('hidden');
-            pendingDeleteId = null;
-        }
-
-        function executeDelete() {
-            if (!pendingDeleteId) return;
-
-            const isDeletingActive = (currentProjectId === pendingDeleteId);
-            projects = projects.filter(p => p.id !== pendingDeleteId);
-            
-            if (isDeletingActive) {
-                currentProjectId = projects[0].id;
-            }
-            
-            closeDeleteModal();
-            loadCurrentProjectData();
-            renderProjectList();
-        }
-
-        function handleDeleteCurrent(event) {
-            showDeleteModal(currentProjectId, event);
-        }
-
-        function loadCurrentProjectData() {
-            const p = projects.find(proj => proj.id === currentProjectId);
-            if (!p) return;
-
-            document.getElementById('product_name').value = p.name;
-            document.getElementById('product_detail').value = p.detail;
-            document.getElementById('exw_price').value = p.exw || "";
-            document.getElementById('exc_rate').value = p.rate || "";
-            document.getElementById('quantity').value = p.qty || "";
-            
-            // Sync hidden inputs if any
-            if(document.getElementById('ship_pct')) document.getElementById('ship_pct').value = p.shipPct;
-            if(document.getElementById('domestic_pct')) document.getElementById('domestic_pct').value = p.domesticPct;
-            if(document.getElementById('gp_pct')) document.getElementById('gp_pct').value = p.gpPct;
-
-            calculate();
-        }
-
-        function updateProjectData(field, value) {
-            const p = projects.find(proj => proj.id === currentProjectId);
-            if (!p) return;
-
-            if (field === 'name' || field === 'detail') {
-                p[field] = value;
-            } else {
-                p[field] = parseFloat(value) || 0;
-            }
-
-            if (field === 'name' || field === 'qty') renderProjectList();
-            calculate();
-        }
-
-        function format(num, sym = '฿', dec = 0) {
-            return sym + (num || 0).toLocaleString(undefined, { minimumFractionDigits: dec, maximumFractionDigits: dec });
+        function formatNum(val) {
+            return Math.round(val).toLocaleString();
         }
 
         function calculate() {
-            const p = projects.find(proj => proj.id === currentProjectId);
-            if (!p) return;
+            const exw = parseFloat(elements.exw_price.value) || 0;
+            const rate = parseFloat(elements.exc_rate.value) || 0;
+            const qty = parseFloat(elements.quantity.value) || 1;
+            const shipPct = (parseFloat(elements.ship_cost_pct.value) || 0) / 100;
+            const domesticPct = (parseFloat(elements.domestic_cost_pct.value) || 0) / 100;
+            const gpPct = (parseFloat(elements.gp_pct.value) || 0) / 100;
 
-            const basePrice = p.exw * p.rate;
-            const shipFact = p.shipPct / 100;
-            const domFact = p.domesticPct / 100;
-            const gpFact = p.gpPct / 100;
+            const unitProductPrice = exw * rate;
+            outputs.product_price_thb.innerText = "฿" + unitProductPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
 
-            const unitCostShip = shipFact < 1 ? basePrice / (1 - shipFact) : 0;
-            const shipDiff = unitCostShip - basePrice;
+            const unitCostShipMain = shipPct < 1 ? unitProductPrice / (1 - shipPct) : 0;
+            const unitCostShipDiff = unitCostShipMain - unitProductPrice;
+            
+            const unitTotalCostMain = domesticPct < 1 ? unitCostShipMain / (1 - domesticPct) : 0;
+            const unitTotalCostDiff = unitTotalCostMain - unitCostShipMain;
 
-            const unitTotalCost = domFact < 1 ? unitCostShip / (1 - domFact) : 0;
-            const domDiff = unitTotalCost - unitCostShip;
+            const unitTotalPrice = gpPct < 1 ? unitTotalCostMain / (1 - gpPct) : 0;
+            const unitProfit = unitTotalPrice - unitTotalCostMain;
 
-            const unitSellingPrice = gpFact < 1 ? unitTotalCost / (1 - gpFact) : 0;
-            const unitProfit = unitSellingPrice - unitTotalCost;
+            const totalShipCost = Math.round(unitCostShipDiff) * qty;
+            const totalDomesticCost = Math.round(unitTotalCostDiff) * qty;
+            const totalCostSum = Math.round(unitTotalCostMain) * qty; 
+            
+            outputs.breakdown_ship.innerText = "฿" + formatNum(totalShipCost);
+            outputs.breakdown_domestic.innerText = "฿" + formatNum(totalDomesticCost);
+            outputs.breakdown_total_cost.innerText = "฿" + formatNum(totalCostSum);
 
-            document.getElementById('product_price_thb').innerText = format(basePrice, '฿', 2);
-            document.getElementById('sum_ship').innerText = format(Math.round(shipDiff) * p.qty);
-            document.getElementById('sum_domestic').innerText = format(Math.round(domDiff) * p.qty);
-            document.getElementById('sum_total_cost').innerText = format(Math.round(unitTotalCost) * p.qty);
-
-            document.getElementById('unit_final').innerText = format(Math.round(unitSellingPrice));
-            document.getElementById('grand_price').innerText = format(Math.round(unitSellingPrice) * p.qty);
-            document.getElementById('grand_profit').innerText = format(Math.round(unitProfit) * p.qty);
+            outputs.unit_price_final.innerText = "฿" + formatNum(unitTotalPrice);
+            outputs.grand_total_price.innerText = "฿" + formatNum(unitTotalPrice * qty);
+            outputs.grand_total_profit.innerText = "฿" + formatNum(unitProfit * qty);
         }
 
         async function saveAsImage() {
+            const btnContainer = document.getElementById('action-buttons');
             const card = document.getElementById('calculator-card');
-            const btns = document.getElementById('action-buttons');
-            const pName = document.getElementById('product_name').value || 'Calculation';
-
-            // Sync input values to DOM for html2canvas
-            document.querySelectorAll('input, textarea').forEach(el => {
-                el.setAttribute('value', el.value);
-            });
-
-            btns.classList.add('no-export');
-
+            const productName = document.getElementById('product_name').value || 'Product-Calculation';
+            
+            // Temporary hide buttons during capture
+            btnContainer.classList.add('no-export');
+            
             try {
                 const canvas = await html2canvas(card, {
-                    scale: 2,
-                    backgroundColor: "#ffffff",
-                    logging: false,
-                    onclone: (clonedDoc) => {
-                        // Ensure input values are correct in the clone
-                        const cloneName = clonedDoc.getElementById('product_name');
-                        const cloneDetail = clonedDoc.getElementById('product_detail');
-                        if (cloneName) cloneName.value = document.getElementById('product_name').value;
-                        if (cloneDetail) cloneDetail.value = document.getElementById('product_detail').value;
-                    }
+                    scale: 2, // Higher quality
+                    useCORS: true,
+                    backgroundColor: "#ffffff"
                 });
+                
                 const link = document.createElement('a');
-                link.download = `${pName}.png`;
+                link.download = `${productName}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             } catch (err) {
-                console.error("Capture Error:", err);
-                alert('เกิดข้อผิดพลาดในการบันทึกรูปภาพ: ' + err.message);
+                console.error('Error generating image:', err);
+                alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ');
             } finally {
-                btns.classList.remove('no-export');
+                // Show buttons again
+                btnContainer.classList.remove('no-export');
             }
         }
 
-        window.onload = () => {
-            loadCurrentProjectData();
-            renderProjectList();
-        };
+        inputIds.forEach(id => {
+            elements[id].addEventListener('input', calculate);
+        });
+
+        window.onload = calculate;
     </script>
 </body>
 </html>
