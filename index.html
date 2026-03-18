@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi-Project Product Calculator v2.3</title>
+    <title>Multi-Project Product Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
@@ -24,14 +24,6 @@
             border-left: 4px solid #2563eb;
             background-color: #eff6ff;
         }
-        /* แก้ไขให้ปุ่มลบเห็นชัดขึ้น */
-        .delete-btn-sidebar {
-            opacity: 0.4;
-            transition: opacity 0.2s;
-        }
-        .delete-btn-sidebar:hover {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
@@ -42,16 +34,16 @@
         <div class="w-full md:w-64 bg-white border-r border-gray-200 flex flex-col no-print">
             <div class="p-4 border-b bg-gray-800">
                 <h2 class="text-white font-bold text-lg">My Projects</h2>
-                <button onclick="addNewProject()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded flex items-center justify-center gap-2 transition shadow-lg">
+                <button onclick="addNewProject()" class="mt-2 w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded flex items-center justify-center gap-2 transition shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z"></path></svg>
                     New Project
                 </button>
             </div>
             <div id="project-list" class="flex-1 overflow-y-auto p-2 space-y-1">
-                <!-- Projects rendered here -->
+                <!-- Projects will be rendered here -->
             </div>
-            <div class="p-4 border-t text-[10px] text-gray-400 text-center uppercase tracking-widest">
-                Stable Manager v2.3
+            <div class="p-4 border-t text-[10px] text-gray-400 text-center uppercase">
+                Project Manager v2.2
             </div>
         </div>
 
@@ -62,10 +54,8 @@
                 <!-- Main Header -->
                 <div class="bg-gray-800 p-4 flex justify-between items-center">
                     <h1 class="text-white text-lg font-semibold uppercase tracking-wider">Product Calculator</h1>
-                    <!-- Main Delete Button -->
-                    <button onclick="handleDeleteProject(currentProjectId, event)" class="bg-red-900/30 text-red-400 hover:bg-red-600 hover:text-white p-2 rounded no-export transition flex items-center gap-1 text-xs" title="Delete Project">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
-                        <span>DELETE</span>
+                    <button onclick="handleDeleteCurrent(event)" class="text-red-400 hover:text-red-300 p-2 rounded no-export transition" title="Delete Current Project">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
                     </button>
                 </div>
 
@@ -91,7 +81,6 @@
                             <div class="col-span-3 text-right">Unit</div>
                         </div>
 
-                        <!-- EXW Price -->
                         <div class="grid grid-cols-12 gap-2 items-center py-2">
                             <div class="col-span-5 text-gray-700 font-medium text-sm">EXW Price</div>
                             <div class="col-span-4">
@@ -101,7 +90,6 @@
                             <div class="col-span-3 text-right text-gray-500">¥</div>
                         </div>
 
-                        <!-- EXC Rate -->
                         <div class="grid grid-cols-12 gap-2 items-center py-2">
                             <div class="col-span-5 text-gray-700 font-medium text-sm">EXC Rate</div>
                             <div class="col-span-4">
@@ -111,7 +99,6 @@
                             <div class="col-span-3 text-right text-gray-500 text-xs italic">Thb/RMB</div>
                         </div>
 
-                        <!-- Quantity -->
                         <div class="grid grid-cols-12 gap-2 items-center py-2 bg-yellow-50 rounded-lg px-2 -mx-2 border border-yellow-100">
                             <div class="col-span-5 text-orange-700 font-bold italic text-sm">Quantity</div>
                             <div class="col-span-4">
@@ -123,7 +110,40 @@
 
                         <hr class="my-4 border-gray-100">
 
-                        <!-- Pricing Table Summary -->
+                        <div class="grid grid-cols-12 gap-2 items-center py-1 text-xs">
+                            <div class="col-span-5 text-gray-500 italic">Price THB (base)</div>
+                            <div class="col-span-4 text-right pr-2 font-semibold text-gray-700" id="product_price_thb">฿0.00</div>
+                            <div class="col-span-3"></div>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-2 items-center py-2">
+                            <div class="col-span-5 text-gray-700 text-sm">Shipping Cost (%)</div>
+                            <div class="col-span-4">
+                                <input type="number" id="ship_pct" oninput="updateProjectData('shipPct', this.value)" step="0.01"
+                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
+                            </div>
+                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-2 items-center py-2">
+                            <div class="col-span-5 text-gray-700 text-sm">Domestic/Packing (%)</div>
+                            <div class="col-span-4">
+                                <input type="number" id="domestic_pct" oninput="updateProjectData('domesticPct', this.value)" step="0.01"
+                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
+                            </div>
+                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
+                        </div>
+
+                        <div class="grid grid-cols-12 gap-2 items-center py-2">
+                            <div class="col-span-5 text-gray-700 text-sm">GP Margin (%)</div>
+                            <div class="col-span-4">
+                                <input type="number" id="gp_pct" oninput="updateProjectData('gpPct', this.value)" step="0.01"
+                                    class="w-full text-right p-2 border border-gray-300 rounded input-yellow text-sm outline-none">
+                            </div>
+                            <div class="col-span-3 text-right text-gray-500 text-xs">%</div>
+                        </div>
+
+                        <!-- Answer Summary -->
                         <div class="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-xl space-y-2 shadow-sm">
                             <h3 class="text-orange-800 font-bold text-[10px] uppercase tracking-wider">Answer Summary</h3>
                             <div class="flex justify-between text-sm">
@@ -140,7 +160,7 @@
                             </div>
                         </div>
 
-                        <!-- Final Display -->
+                        <!-- Results -->
                         <div class="bg-gray-800 rounded-xl p-5 mt-6 space-y-3 shadow-lg">
                             <div class="flex justify-between items-center text-gray-300 text-xs">
                                 <span>Selling Price Per Unit</span>
@@ -148,38 +168,31 @@
                             </div>
                             <div class="flex justify-between items-center border-t border-gray-700 pt-3">
                                 <div>
-                                    <span class="text-blue-400 font-bold text-lg leading-none uppercase tracking-tighter">Grand Total Price</span>
-                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic">ราคาสุทธิทั้งหมด</p>
+                                    <span class="text-blue-400 font-bold text-lg leading-none uppercase">Grand Total Price</span>
+                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">ราคาสุทธิทั้งหมด</p>
                                 </div>
                                 <div id="grand_price" class="text-3xl font-black text-white">฿0</div>
                             </div>
                             <div class="flex justify-between items-center bg-gray-700 -mx-5 px-5 py-3 mt-2 rounded-b-xl">
                                 <div>
-                                    <span class="text-green-400 font-bold text-lg leading-none uppercase tracking-tighter">Total Profit</span>
-                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic">กำไรรวมทั้งหมด</p>
+                                    <span class="text-green-400 font-bold text-lg leading-none uppercase">Total Profit</span>
+                                    <p class="text-[9px] text-gray-500 mt-1 uppercase italic tracking-tighter">กำไรรวมทั้งหมด</p>
                                 </div>
                                 <div id="grand_profit" class="text-2xl font-bold text-green-400">฿0</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div id="action-buttons" class="mt-6 flex gap-2">
-                        <button onclick="saveAsImage()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-md">
+                    <div id="action-buttons" class="mt-6">
+                        <button onclick="saveAsImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-md">
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM176,192H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Z"></path></svg>
-                            Save as Image
+                            Save current as Image
                         </button>
                     </div>
                 </div>
 
-                <!-- Footer hidden configs -->
-                <div class="hidden">
-                    <input type="number" id="ship_pct" oninput="updateProjectData('shipPct', this.value)">
-                    <input type="number" id="domestic_pct" oninput="updateProjectData('domesticPct', this.value)">
-                    <input type="number" id="gp_pct" oninput="updateProjectData('gpPct', this.value)">
-                </div>
-
                 <div class="bg-gray-100 p-3 text-center text-[9px] text-gray-400 uppercase tracking-widest">
-                    Precision Engine v2.3
+                    Precision Calculation Engine
                 </div>
             </div>
         </div>
@@ -188,11 +201,21 @@
     <script>
         // --- State ---
         let projects = [
-            { id: Date.now(), name: "Project 1", detail: "Default", exw: 76, rate: 5, qty: 1, shipPct: 40, domesticPct: 3, gpPct: 10 }
+            {
+                id: Date.now(),
+                name: "Project 1",
+                detail: "Default calculation",
+                exw: 76.00,
+                rate: 5.00,
+                qty: 1,
+                shipPct: 40.00,
+                domesticPct: 3.00,
+                gpPct: 10.00
+            }
         ];
         let currentProjectId = projects[0].id;
 
-        // --- Render UI ---
+        // --- View Logic ---
         function renderProjectList() {
             const list = document.getElementById('project-list');
             list.innerHTML = '';
@@ -200,15 +223,15 @@
             projects.forEach(p => {
                 const div = document.createElement('div');
                 div.className = `p-3 rounded cursor-pointer transition flex justify-between items-center group border ${p.id === currentProjectId ? 'active-project' : 'border-transparent hover:bg-gray-50'}`;
-                div.onclick = (e) => switchProject(p.id);
+                div.onclick = () => switchProject(p.id);
                 
                 div.innerHTML = `
                     <div class="truncate pr-2">
                         <div class="text-sm font-bold text-gray-800 truncate">${p.name || 'Untitled'}</div>
                         <div class="text-[10px] text-gray-400">Qty: ${p.qty}</div>
                     </div>
-                    <button onclick="handleDeleteProject(${p.id}, event)" class="delete-btn-sidebar p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-all" title="Delete Project">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
+                    <button onclick="handleDeleteProject(${p.id}, event)" class="opacity-0 group-hover:opacity-100 p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded transition" title="Delete Project">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256"><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"></path></svg>
                     </button>
                 `;
                 list.appendChild(div);
@@ -226,12 +249,17 @@
             projects.push({
                 id: newId,
                 name: `Project ${projects.length + 1}`,
-                detail: "", exw: 0, rate: 5, qty: 1, shipPct: 0, domesticPct: 0, gpPct: 0
+                detail: "",
+                exw: 0,
+                rate: 5,
+                qty: 1,
+                shipPct: 0,
+                domesticPct: 0,
+                gpPct: 0
             });
             switchProject(newId);
         }
 
-        // Improved Delete Logic
         function handleDeleteProject(id, event) {
             if (event) {
                 event.stopPropagation();
@@ -243,7 +271,7 @@
                 return;
             }
 
-            if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบโปรเจกต์นี้?")) {
+            if (confirm("ยืนยันการลบโปรเจกต์นี้?")) {
                 const isDeletingActive = (currentProjectId === id);
                 projects = projects.filter(p => p.id !== id);
                 
@@ -256,6 +284,10 @@
             }
         }
 
+        function handleDeleteCurrent(event) {
+            handleDeleteProject(currentProjectId, event);
+        }
+
         function loadCurrentProjectData() {
             const p = projects.find(proj => proj.id === currentProjectId);
             if (!p) return;
@@ -265,11 +297,9 @@
             document.getElementById('exw_price').value = p.exw || "";
             document.getElementById('exc_rate').value = p.rate || "";
             document.getElementById('quantity').value = p.qty || "";
-            
-            // Sync values to hidden or updated fields if visible
-            if (document.getElementById('ship_pct')) document.getElementById('ship_pct').value = p.shipPct;
-            if (document.getElementById('domestic_pct')) document.getElementById('domestic_pct').value = p.domesticPct;
-            if (document.getElementById('gp_pct')) document.getElementById('gp_pct').value = p.gpPct;
+            document.getElementById('ship_pct').value = p.shipPct || "";
+            document.getElementById('domestic_pct').value = p.domesticPct || "";
+            document.getElementById('gp_pct').value = p.gpPct || "";
 
             calculate();
         }
@@ -310,15 +340,14 @@
             const unitSellingPrice = gpFact < 1 ? unitTotalCost / (1 - gpFact) : 0;
             const unitProfit = unitSellingPrice - unitTotalCost;
 
-            if (document.getElementById('product_price_thb')) {
-                document.getElementById('product_price_thb').innerText = format(basePrice, '฿', 2);
-                document.getElementById('sum_ship').innerText = format(Math.round(shipDiff) * p.qty);
-                document.getElementById('sum_domestic').innerText = format(Math.round(domDiff) * p.qty);
-                document.getElementById('sum_total_cost').innerText = format(Math.round(unitTotalCost) * p.qty);
-                document.getElementById('unit_final').innerText = format(Math.round(unitSellingPrice));
-                document.getElementById('grand_price').innerText = format(Math.round(unitSellingPrice) * p.qty);
-                document.getElementById('grand_profit').innerText = format(Math.round(unitProfit) * p.qty);
-            }
+            document.getElementById('product_price_thb').innerText = format(basePrice, '฿', 2);
+            document.getElementById('sum_ship').innerText = format(Math.round(shipDiff) * p.qty);
+            document.getElementById('sum_domestic').innerText = format(Math.round(domDiff) * p.qty);
+            document.getElementById('sum_total_cost').innerText = format(Math.round(unitTotalCost) * p.qty);
+
+            document.getElementById('unit_final').innerText = format(Math.round(unitSellingPrice));
+            document.getElementById('grand_price').innerText = format(Math.round(unitSellingPrice) * p.qty);
+            document.getElementById('grand_profit').innerText = format(Math.round(unitProfit) * p.qty);
         }
 
         async function saveAsImage() {
@@ -326,15 +355,35 @@
             const btns = document.getElementById('action-buttons');
             const pName = document.getElementById('product_name').value || 'Calculation';
 
+            document.querySelectorAll('input, textarea').forEach(el => {
+                if (el.type !== 'checkbox' && el.type !== 'radio') {
+                    el.setAttribute('value', el.value);
+                }
+            });
+
             btns.classList.add('no-export');
+
             try {
-                const canvas = await html2canvas(card, { scale: 2, backgroundColor: "#ffffff" });
+                const canvas = await html2canvas(card, {
+                    scale: 2,
+                    backgroundColor: "#ffffff",
+                    logging: false,
+                    onclone: (clonedDoc) => {
+                        const cloneName = clonedDoc.getElementById('product_name');
+                        const cloneDetail = clonedDoc.getElementById('product_detail');
+                        if (cloneName) cloneName.value = document.getElementById('product_name').value;
+                        if (cloneDetail) cloneDetail.value = document.getElementById('product_detail').value;
+                    }
+                });
                 const link = document.createElement('a');
                 link.download = `${pName}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-            } catch (err) { alert('Export failed'); }
-            btns.classList.remove('no-export');
+            } catch (err) {
+                alert('Export failed: ' + err.message);
+            } finally {
+                btns.classList.remove('no-export');
+            }
         }
 
         window.onload = () => {
