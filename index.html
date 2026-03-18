@@ -12,6 +12,16 @@
             font-family: 'Sarabun', sans-serif;
             background-color: #f3f4f6;
         }
+        /* บังคับใช้สีมาตรฐานเพื่อป้องกัน Error 'oklch' ตอนบันทึกรูป */
+        #calculator-card, #calculator-card * {
+            --tw-ring-color: rgba(59, 130, 246, 0.5) !important;
+            --tw-ring-offset-shadow: 0 0 #0000 !important;
+            --tw-ring-shadow: 0 0 #0000 !important;
+            --tw-shadow: 0 0 #0000 !important;
+        }
+        .bg-gray-800 { background-color: #1f2937 !important; }
+        .bg-orange-50 { background-color: #fff7ed !important; }
+        
         .input-yellow {
             background-color: #fef9c3;
         }
@@ -85,10 +95,10 @@
 
                 <!-- Quantity Section -->
                 <div class="grid grid-cols-12 gap-2 items-center py-2 bg-yellow-50 rounded-lg px-2 -mx-2 border border-yellow-100">
-                    <div class="col-span-5 text-orange-700 font-bold italic">Quantity (จำนวนสินค้า)</div>
+                    <div class="col-span-5 text-orange-700 font-bold italic text-lg">Quantity (จำนวนสินค้า)</div>
                     <div class="col-span-4">
                         <input type="number" id="quantity" value="1" min="1" step="1"
-                            class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow focus:ring-2 focus:ring-orange-400 outline-none font-bold">
+                            class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow focus:ring-2 focus:ring-orange-400 outline-none font-bold text-lg">
                     </div>
                     <div class="col-span-3 text-right text-gray-500 italic">PCS</div>
                 </div>
@@ -254,14 +264,35 @@
             const card = document.getElementById('calculator-card');
             const productName = document.getElementById('product_name').value || 'Product-Calculation';
             
-            // Temporary hide buttons during capture
+            // Sync values to attributes so html2canvas sees them correctly
+            document.querySelectorAll('input, textarea').forEach(el => {
+                el.setAttribute('value', el.value);
+            });
+            
             btnContainer.classList.add('no-export');
             
             try {
                 const canvas = await html2canvas(card, {
-                    scale: 2, // Higher quality
+                    scale: 2, 
                     useCORS: true,
-                    backgroundColor: "#ffffff"
+                    backgroundColor: "#ffffff",
+                    onclone: (clonedDoc) => {
+                        // Fix for oklch error: manually replace potential problematic styles in the clone
+                        const allElements = clonedDoc.getElementsByTagName("*");
+                        for (let el of allElements) {
+                            const style = window.getComputedStyle(el);
+                            // Ensure background colors are HEX/RGB
+                            if (el.classList.contains('bg-gray-800')) el.style.backgroundColor = '#1f2937';
+                            if (el.classList.contains('bg-orange-50')) el.style.backgroundColor = '#fff7ed';
+                            if (el.classList.contains('bg-gray-50')) el.style.backgroundColor = '#f9fafb';
+                            if (el.classList.contains('bg-yellow-50')) el.style.backgroundColor = '#fefce8';
+                            if (el.classList.contains('bg-gray-700')) el.style.backgroundColor = '#374151';
+                            
+                            // Remove ring and shadow variables that often use oklch
+                            el.style.setProperty('--tw-ring-color', 'transparent');
+                            el.style.setProperty('--tw-shadow', 'none');
+                        }
+                    }
                 });
                 
                 const link = document.createElement('a');
@@ -270,9 +301,8 @@
                 link.click();
             } catch (err) {
                 console.error('Error generating image:', err);
-                alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ');
+                alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ: ' + err.message);
             } finally {
-                // Show buttons again
                 btnContainer.classList.remove('no-export');
             }
         }
