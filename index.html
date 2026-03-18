@@ -12,16 +12,27 @@
             font-family: 'Sarabun', sans-serif;
             background-color: #f3f4f6;
         }
-        /* บังคับใช้สีมาตรฐานเพื่อป้องกัน Error 'oklch' ตอนบันทึกรูป */
-        #calculator-card, #calculator-card * {
-            --tw-ring-color: rgba(59, 130, 246, 0.5) !important;
+        
+        /* บังคับใช้สีมาตรฐาน HEX เพื่อป้องกัน html2canvas ตีความ 'oklch' ไม่ได้ */
+        #calculator-card {
+            background-color: #ffffff !important;
+        }
+        
+        .bg-gray-800 { background-color: #1f2937 !important; }
+        .bg-orange-50 { background-color: #fff7ed !important; }
+        .bg-gray-50 { background-color: #f9fafb !important; }
+        .bg-yellow-50 { background-color: #fefce8 !important; }
+        .bg-gray-700 { background-color: #374151 !important; }
+        
+        /* ล้างค่าตัวแปร CSS ที่อาจมีปัญหาออกในการตั้งค่าพื้นฐาน */
+        #calculator-card * {
+            --tw-ring-color: transparent !important;
             --tw-ring-offset-shadow: 0 0 #0000 !important;
             --tw-ring-shadow: 0 0 #0000 !important;
             --tw-shadow: 0 0 #0000 !important;
+            --tw-shadow-colored: 0 0 #0000 !important;
         }
-        .bg-gray-800 { background-color: #1f2937 !important; }
-        .bg-orange-50 { background-color: #fff7ed !important; }
-        
+
         .input-yellow {
             background-color: #fef9c3;
         }
@@ -33,7 +44,7 @@
             -webkit-appearance: none;
             margin: 0;
         }
-        /* Style for saving image to ensure no buttons show in the capture */
+        /* ซ่อนปุ่มเมื่อบันทึกรูป */
         .no-export {
             display: none !important;
         }
@@ -49,7 +60,7 @@
 
         <div class="p-6 space-y-4">
             
-            <!-- NEW SECTION: Header & Detail -->
+            <!-- SECTION: Header & Detail -->
             <div class="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Product Name / Title (หัวข้อสินค้า)</label>
@@ -68,9 +79,9 @@
             <div class="space-y-1">
                 <!-- Table Header -->
                 <div class="grid grid-cols-12 gap-2 pb-2 border-b font-semibold text-gray-600 text-sm">
-                    <div class="col-span-5 text-left">รายการ (Description)</div>
-                    <div class="col-span-4 text-right">จำนวน (Value)</div>
-                    <div class="col-span-3 text-right">หน่วย (Unit)</div>
+                    <div class="col-span-5 text-left text-xs uppercase tracking-tighter">รายการ (Description)</div>
+                    <div class="col-span-4 text-right text-xs uppercase tracking-tighter">จำนวน (Value)</div>
+                    <div class="col-span-3 text-right text-xs uppercase tracking-tighter">หน่วย (Unit)</div>
                 </div>
 
                 <!-- EXW Price -->
@@ -80,7 +91,7 @@
                         <input type="number" id="exw_price" value="76.00" step="0.01"
                             class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500">¥</div>
+                    <div class="col-span-3 text-right text-gray-500 font-mono text-sm">¥</div>
                 </div>
 
                 <!-- EXC Rate -->
@@ -90,7 +101,7 @@
                         <input type="number" id="exc_rate" value="5" step="0.01"
                             class="w-full text-right p-2 border border-gray-300 rounded input-blue focus:ring-2 focus:ring-blue-400 outline-none">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500">Thb/RMB</div>
+                    <div class="col-span-3 text-right text-gray-500 text-xs">Thb/RMB</div>
                 </div>
 
                 <!-- Quantity Section -->
@@ -100,7 +111,7 @@
                         <input type="number" id="quantity" value="1" min="1" step="1"
                             class="w-full text-right p-2 border-2 border-orange-200 rounded input-yellow focus:ring-2 focus:ring-orange-400 outline-none font-bold text-lg">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500 italic">PCS</div>
+                    <div class="col-span-3 text-right text-gray-500 italic font-bold">PCS</div>
                 </div>
 
                 <hr class="my-4 border-gray-100">
@@ -109,7 +120,7 @@
                 <div class="grid grid-cols-12 gap-2 items-center py-2">
                     <div class="col-span-5 text-gray-700">Product Price (THB)</div>
                     <div class="col-span-4 text-right pr-2 text-lg font-semibold" id="product_price_thb">฿380.00</div>
-                    <div class="col-span-3 text-right text-gray-400 text-xs">THB/PCS</div>
+                    <div class="col-span-3 text-right text-gray-400 text-[10px] uppercase">THB/PCS</div>
                 </div>
 
                 <!-- Over Sea ship cost -->
@@ -119,7 +130,7 @@
                         <input type="number" id="ship_cost_pct" value="40.00" step="0.01"
                             class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500">%</div>
+                    <div class="col-span-3 text-right text-gray-500 font-bold">%</div>
                 </div>
 
                 <!-- Domestic & packing cost -->
@@ -129,7 +140,7 @@
                         <input type="number" id="domestic_cost_pct" value="3.00" step="0.01"
                             class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500">%</div>
+                    <div class="col-span-3 text-right text-gray-500 font-bold">%</div>
                 </div>
 
                 <!-- GP Margin -->
@@ -139,7 +150,7 @@
                         <input type="number" id="gp_pct" value="10.00" step="0.01"
                             class="w-full text-right p-2 border border-gray-300 rounded input-yellow focus:ring-2 focus:ring-yellow-400 outline-none">
                     </div>
-                    <div class="col-span-3 text-right text-gray-500">%</div>
+                    <div class="col-span-3 text-right text-gray-500 font-bold">%</div>
                 </div>
 
                 <!-- ANSWER SUMMARY BOX -->
@@ -155,7 +166,7 @@
                             <span id="breakdown_domestic" class="font-bold text-lg text-gray-900">฿20</span>
                         </div>
                         <div class="flex justify-between items-center pt-1">
-                            <span class="text-orange-900 font-bold text-sm underline italic">ต้นทุนรวมทั้งหมด (Total Cost):</span>
+                            <span class="text-orange-900 font-bold text-sm underline italic font-medium">ต้นทุนรวมทั้งหมด (Total Cost):</span>
                             <span id="breakdown_total_cost" class="font-black text-xl text-orange-700">฿653</span>
                         </div>
                     </div>
@@ -172,37 +183,38 @@
 
                     <div class="flex justify-between items-center border-t border-gray-700 pt-3">
                         <div class="flex flex-col">
-                            <span class="text-blue-400 font-bold text-lg uppercase leading-none">Grand Total Price</span>
-                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic">ราคาสุทธิทั้งหมด</span>
+                            <span class="text-blue-400 font-bold text-lg uppercase leading-none tracking-tighter">Grand Total Price</span>
+                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic font-normal tracking-wide">ราคาสุทธิทั้งหมด</span>
                         </div>
-                        <div id="grand_total_price" class="text-4xl font-black text-white">฿725</div>
+                        <div id="grand_total_price" class="text-4xl font-black text-white tracking-tighter">฿725</div>
                     </div>
 
                     <div class="flex justify-between items-center bg-gray-700 -mx-5 px-5 py-3 mt-2 rounded-b-xl">
                         <div class="flex flex-col">
-                            <span class="text-green-400 font-bold text-lg uppercase leading-none">Total Profit</span>
-                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic">กำไรรวมทั้งหมด</span>
+                            <span class="text-green-400 font-bold text-lg uppercase leading-none tracking-tighter">Total Profit</span>
+                            <span class="text-[10px] text-gray-500 mt-1 uppercase italic font-normal tracking-wide">กำไรรวมทั้งหมด</span>
                         </div>
-                        <div id="grand_total_profit" class="text-3xl font-bold text-green-400">฿73</div>
+                        <div id="grand_total_profit" class="text-3xl font-bold text-green-400 tracking-tighter">฿73</div>
                     </div>
                 </div>
             </div>
             
             <!-- EXPORT BUTTON SECTION -->
             <div id="action-buttons" class="mt-6">
-                <button onclick="saveAsImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM176,192H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Z"></path></svg>
+                <button onclick="saveAsImage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-4 rounded-lg flex items-center justify-center gap-2 transition duration-200 shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256"><path d="M208,32H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM176,192H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Zm0-32H80a8,8,0,0,1,0-16h96a8,8,0,0,1,0,16Z"></path></svg>
                     บันทึกเป็นรูปภาพ (Save as Image)
                 </button>
             </div>
         </div>
 
-        <div class="bg-gray-100 p-4 text-center text-[10px] text-gray-400 uppercase tracking-widest">
-            Automatic Calculation Engine
+        <div class="bg-gray-100 p-4 text-center text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+            Precision Calculation Engine
         </div>
     </div>
 
     <script>
+        // Mapping of element IDs to access them easily
         const inputIds = [
             'exw_price', 'exc_rate', 'quantity', 'ship_cost_pct', 'domestic_cost_pct', 'gp_pct'
         ];
@@ -237,6 +249,7 @@
             const unitProductPrice = exw * rate;
             outputs.product_price_thb.innerText = "฿" + unitProductPrice.toLocaleString(undefined, {minimumFractionDigits: 2});
 
+            // Margin calculation logic based on user's image formula
             const unitCostShipMain = shipPct < 1 ? unitProductPrice / (1 - shipPct) : 0;
             const unitCostShipDiff = unitCostShipMain - unitProductPrice;
             
@@ -259,12 +272,15 @@
             outputs.grand_total_profit.innerText = "฿" + formatNum(unitProfit * qty);
         }
 
+        /**
+         * Enhanced Save Function to avoid oklch errors
+         */
         async function saveAsImage() {
             const btnContainer = document.getElementById('action-buttons');
             const card = document.getElementById('calculator-card');
-            const productName = document.getElementById('product_name').value || 'Product-Calculation';
+            const productName = document.getElementById('product_name').value || 'Price_Calculation';
             
-            // Sync values to attributes so html2canvas sees them correctly
+            // Critical: Ensure inputs values are mapped to DOM attributes before cloning
             document.querySelectorAll('input, textarea').forEach(el => {
                 el.setAttribute('value', el.value);
             });
@@ -276,21 +292,47 @@
                     scale: 2, 
                     useCORS: true,
                     backgroundColor: "#ffffff",
+                    logging: false,
                     onclone: (clonedDoc) => {
-                        // Fix for oklch error: manually replace potential problematic styles in the clone
+                        // Advanced Sanitization: Iterate through all elements in the clone
                         const allElements = clonedDoc.getElementsByTagName("*");
-                        for (let el of allElements) {
-                            const style = window.getComputedStyle(el);
-                            // Ensure background colors are HEX/RGB
-                            if (el.classList.contains('bg-gray-800')) el.style.backgroundColor = '#1f2937';
-                            if (el.classList.contains('bg-orange-50')) el.style.backgroundColor = '#fff7ed';
-                            if (el.classList.contains('bg-gray-50')) el.style.backgroundColor = '#f9fafb';
-                            if (el.classList.contains('bg-yellow-50')) el.style.backgroundColor = '#fefce8';
-                            if (el.classList.contains('bg-gray-700')) el.style.backgroundColor = '#374151';
+                        for (let i = 0; i < allElements.length; i++) {
+                            const el = allElements[i];
                             
-                            // Remove ring and shadow variables that often use oklch
-                            el.style.setProperty('--tw-ring-color', 'transparent');
-                            el.style.setProperty('--tw-shadow', 'none');
+                            // 1. Scrub specific Tailwind classes that might trigger oklch defaults
+                            // (Tailwind 4 uses oklch for nearly everything)
+                            const style = window.getComputedStyle(el);
+                            
+                            // 2. Identify and force replace standard color names if they contain oklch
+                            if (style.backgroundColor && style.backgroundColor.includes('oklch')) {
+                                el.style.backgroundColor = 'transparent';
+                                // Specific overrides for known containers
+                                if (el.classList.contains('bg-gray-800')) el.style.backgroundColor = '#1f2937';
+                                if (el.classList.contains('bg-orange-50')) el.style.backgroundColor = '#fff7ed';
+                                if (el.classList.contains('bg-gray-50')) el.style.backgroundColor = '#f9fafb';
+                                if (el.classList.contains('bg-yellow-50')) el.style.backgroundColor = '#fefce8';
+                            }
+                            
+                            if (style.color && style.color.includes('oklch')) {
+                                el.style.color = '#000000';
+                                if (el.classList.contains('text-white')) el.style.color = '#ffffff';
+                                if (el.classList.contains('text-green-400')) el.style.color = '#4ade80';
+                                if (el.classList.contains('text-blue-400')) el.style.color = '#60a5fa';
+                            }
+
+                            // 3. Remove all ring and shadow CSS variables entirely
+                            el.style.setProperty('--tw-ring-color', 'transparent', 'important');
+                            el.style.setProperty('--tw-ring-shadow', 'none', 'important');
+                            el.style.setProperty('--tw-shadow', 'none', 'important');
+                            el.style.setProperty('--tw-ring-offset-shadow', 'none', 'important');
+                            el.style.setProperty('--tw-shadow-colored', 'none', 'important');
+                            
+                            // 4. Force fix inputs display in the clone
+                            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                                el.style.backgroundColor = el.classList.contains('input-yellow') ? '#fef9c3' : 
+                                                          (el.classList.contains('input-blue') ? '#dbeafe' : '#ffffff');
+                                el.style.color = '#000000';
+                            }
                         }
                     }
                 });
@@ -301,16 +343,23 @@
                 link.click();
             } catch (err) {
                 console.error('Error generating image:', err);
-                alert('เกิดข้อผิดพลาดในการสร้างรูปภาพ: ' + err.message);
+                // Non-standard alert avoidance as per system instructions
+                const errorBox = document.createElement('div');
+                errorBox.className = "fixed top-5 left-1/2 -translate-x-1/2 bg-red-600 text-white p-4 rounded shadow-2xl z-[9999]";
+                errorBox.innerText = 'บันทึกรูปภาพไม่สำเร็จ: ' + err.message;
+                document.body.appendChild(errorBox);
+                setTimeout(() => errorBox.remove(), 4000);
             } finally {
                 btnContainer.classList.remove('no-export');
             }
         }
 
+        // Attach listeners for all inputs to trigger real-time calculation
         inputIds.forEach(id => {
             elements[id].addEventListener('input', calculate);
         });
 
+        // Run initial calculation on load
         window.onload = calculate;
     </script>
 </body>
